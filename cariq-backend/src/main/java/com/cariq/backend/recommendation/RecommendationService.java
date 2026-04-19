@@ -31,7 +31,8 @@ public class RecommendationService {
             "You are an expert Indian car advisor. Return only valid JSON, no markdown.";
 
     private static final String USER_PROMPT_TEMPLATE =
-            "A buyer wants: budget=%s, use=%s, priorities=%s, extra=%s. " +
+            "A buyer wants: budget=%s, use=%s, priorities=%s. " +
+            "IMPORTANT — the buyer has the following hard constraints that must be strictly followed (do not recommend any car that violates these): %s. " +
             "Available cars (all within the buyer's budget — do NOT recommend cars outside this list): %s. " +
             "Pick the 3 best fits. Factor in userRating (out of 5) as a signal of real-world owner satisfaction — " +
             "prefer higher-rated cars when other attributes are comparable, but do not let it override a strong match on budget, use case, or priorities. " +
