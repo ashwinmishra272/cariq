@@ -1,7 +1,5 @@
-package com.cariq.backend.controller;
+package com.cariq.backend.car;
 
-import com.cariq.backend.model.Car;
-import com.cariq.backend.repository.CarRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CarControllerTest {
 
     @Mock
-    private CarRepository carRepository;
+    private CarService carService;
 
     @InjectMocks
     private CarController carController;
@@ -38,17 +36,17 @@ class CarControllerTest {
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(carController).build();
 
-        swift   = car(1L, "Maruti",  "Swift",     665000.0, "Petrol",   "Manual",    5);
-        creta   = car(2L, "Hyundai", "Creta",    1850000.0, "Petrol",   "Automatic", 5);
-        nexonEv = car(3L, "Tata",    "Nexon EV", 1995000.0, "Electric", "Automatic", 5);
-        ertiga  = car(4L, "Maruti",  "Ertiga",   1099000.0, "CNG",      "Manual",    7);
+        swift   = car(1L, "Maruti",  "Swift",     665000.0,  "Petrol",   "Manual",    5);
+        creta   = car(2L, "Hyundai", "Creta",    1850000.0,  "Petrol",   "Automatic", 5);
+        nexonEv = car(3L, "Tata",    "Nexon EV", 1995000.0,  "Electric", "Automatic", 5);
+        ertiga  = car(4L, "Maruti",  "Ertiga",   1099000.0,  "CNG",      "Manual",    7);
     }
 
     // ── GET /api/cars ──────────────────────────────────────────────────────────
 
     @Test
     void getAllCars_returnsAllCars() throws Exception {
-        when(carRepository.findAll()).thenReturn(List.of(swift, creta, nexonEv, ertiga));
+        when(carService.findAll()).thenReturn(List.of(swift, creta, nexonEv, ertiga));
 
         mockMvc.perform(get("/api/cars"))
                 .andExpect(status().isOk())
@@ -59,7 +57,7 @@ class CarControllerTest {
 
     @Test
     void getAllCars_emptyRepository_returnsEmptyList() throws Exception {
-        when(carRepository.findAll()).thenReturn(List.of());
+        when(carService.findAll()).thenReturn(List.of());
 
         mockMvc.perform(get("/api/cars"))
                 .andExpect(status().isOk())
@@ -70,7 +68,7 @@ class CarControllerTest {
 
     @Test
     void filterCars_noParams_returnsAll() throws Exception {
-        when(carRepository.findAll()).thenReturn(List.of(swift, creta, nexonEv, ertiga));
+        when(carService.filter(null, null, null)).thenReturn(List.of(swift, creta, nexonEv, ertiga));
 
         mockMvc.perform(get("/api/cars/filter"))
                 .andExpect(status().isOk())
@@ -79,7 +77,7 @@ class CarControllerTest {
 
     @Test
     void filterCars_maxPrice10Lakhs_returnsOnlySwift() throws Exception {
-        when(carRepository.findAll()).thenReturn(List.of(swift, creta, nexonEv, ertiga));
+        when(carService.filter(10.0, null, null)).thenReturn(List.of(swift));
 
         mockMvc.perform(get("/api/cars/filter").param("maxPrice", "10"))
                 .andExpect(status().isOk())
@@ -89,7 +87,7 @@ class CarControllerTest {
 
     @Test
     void filterCars_maxPrice_noMatch_returnsEmptyList() throws Exception {
-        when(carRepository.findAll()).thenReturn(List.of(swift, creta, nexonEv, ertiga));
+        when(carService.filter(5.0, null, null)).thenReturn(List.of());
 
         mockMvc.perform(get("/api/cars/filter").param("maxPrice", "5"))
                 .andExpect(status().isOk())
@@ -98,7 +96,7 @@ class CarControllerTest {
 
     @Test
     void filterCars_fuelTypeElectric_returnsNexonEv() throws Exception {
-        when(carRepository.findAll()).thenReturn(List.of(swift, creta, nexonEv, ertiga));
+        when(carService.filter(null, "Electric", null)).thenReturn(List.of(nexonEv));
 
         mockMvc.perform(get("/api/cars/filter").param("fuelType", "Electric"))
                 .andExpect(status().isOk())
@@ -108,7 +106,7 @@ class CarControllerTest {
 
     @Test
     void filterCars_fuelType_isCaseInsensitive() throws Exception {
-        when(carRepository.findAll()).thenReturn(List.of(swift, creta, nexonEv, ertiga));
+        when(carService.filter(null, "electric", null)).thenReturn(List.of(nexonEv));
 
         mockMvc.perform(get("/api/cars/filter").param("fuelType", "electric"))
                 .andExpect(status().isOk())
@@ -118,7 +116,7 @@ class CarControllerTest {
 
     @Test
     void filterCars_seating7_returnsOnlyErtiga() throws Exception {
-        when(carRepository.findAll()).thenReturn(List.of(swift, creta, nexonEv, ertiga));
+        when(carService.filter(null, null, 7)).thenReturn(List.of(ertiga));
 
         mockMvc.perform(get("/api/cars/filter").param("seating", "7"))
                 .andExpect(status().isOk())
@@ -128,7 +126,7 @@ class CarControllerTest {
 
     @Test
     void filterCars_seating5_returnsAllFourCars() throws Exception {
-        when(carRepository.findAll()).thenReturn(List.of(swift, creta, nexonEv, ertiga));
+        when(carService.filter(null, null, 5)).thenReturn(List.of(swift, creta, nexonEv, ertiga));
 
         mockMvc.perform(get("/api/cars/filter").param("seating", "5"))
                 .andExpect(status().isOk())
@@ -137,7 +135,7 @@ class CarControllerTest {
 
     @Test
     void filterCars_maxPriceAndFuelType_appliesBothConstraints() throws Exception {
-        when(carRepository.findAll()).thenReturn(List.of(swift, creta, nexonEv, ertiga));
+        when(carService.filter(20.0, "Petrol", null)).thenReturn(List.of(swift, creta));
 
         mockMvc.perform(get("/api/cars/filter")
                         .param("maxPrice", "20")
@@ -149,7 +147,7 @@ class CarControllerTest {
 
     @Test
     void filterCars_allThreeParams_returnsOnlyMatching() throws Exception {
-        when(carRepository.findAll()).thenReturn(List.of(swift, creta, nexonEv, ertiga));
+        when(carService.filter(7.0, "Petrol", 5)).thenReturn(List.of(swift));
 
         mockMvc.perform(get("/api/cars/filter")
                         .param("maxPrice", "7")

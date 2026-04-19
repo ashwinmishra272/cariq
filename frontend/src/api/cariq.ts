@@ -17,6 +17,7 @@ interface BackendCar {
   mileage: number;
   seating: number;
   safetyRating: number;
+  userRating: number;
   pros: string;
   cons: string;
 }
@@ -36,7 +37,7 @@ export async function getRecommendations(answers: QuizAnswers): Promise<Recommen
   const { data } = await api.post<BackendRecommendResponse>('/api/recommend', {
     budget: answers.budget,
     use: answers.useCase,
-    priorities: answers.priorities.join(', '),
+    priorities: answers.priorities,
     extra: answers.extraInfo,
   });
 

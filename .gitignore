@@ -1,2 +1,74 @@
-backend/build/
-backend/.gradle/
+# ============================================================
+# macOS
+# ============================================================
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# ============================================================
+# IntelliJ IDEA / JetBrains IDEs
+# ============================================================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# ============================================================
+# VS Code
+# ============================================================
+.vscode/
+!.vscode/extensions.json
+
+# ============================================================
+# Spring Boot / Gradle (cariq-backend)
+# ============================================================
+cariq-backend/build/
+cariq-backend/.gradle/
+cariq-backend/bin/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+
+# ============================================================
+# Secrets & environment files
+# ============================================================
+*.env
+.env.*
+cariq-backend/src/main/resources/application-local.*
+cariq-backend/src/main/resources/application-*.properties
+!cariq-backend/src/main/resources/application.properties
+!cariq-backend/src/main/resources/application.yml
+cariq-backend/src/main/resources/application-dev.yml
+
+# ============================================================
+# Node / Frontend (frontend/)
+# ============================================================
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+*.local
+
+# ============================================================
+# Logs
+# ============================================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ============================================================
+# Claude Code
+# ============================================================
+.claude/
+cariq-backend/.claude/

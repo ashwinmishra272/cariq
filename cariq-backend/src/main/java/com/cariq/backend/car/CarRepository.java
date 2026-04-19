@@ -1,6 +1,5 @@
-package com.cariq.backend.repository;
+package com.cariq.backend.car;
 
-import com.cariq.backend.model.Car;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

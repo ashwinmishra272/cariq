@@ -1,6 +1,5 @@
-package com.cariq.backend.repository;
+package com.cariq.backend.car;
 
-import com.cariq.backend.model.Car;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@TestPropertySource(properties = "openai.api.key=test-key")
+@TestPropertySource(properties = "openai.api-key=test-key")
 @Transactional
 class CarRepositoryTest {
 
@@ -23,13 +22,12 @@ class CarRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        // Clear DataLoader seed data; @Transactional rolls this back after each test
         carRepository.deleteAll();
         carRepository.saveAll(List.of(
-                car("Maruti",  "Swift",    665000.0,  "Petrol",   5),
-                car("Hyundai", "Creta",   1850000.0,  "Petrol",   5),
-                car("Tata",    "Nexon EV",1995000.0,  "Electric", 5),
-                car("Maruti",  "Ertiga",  1099000.0,  "CNG",      7)
+                car("Maruti",  "Swift",     665000.0,  "Petrol",   5),
+                car("Hyundai", "Creta",    1850000.0,  "Petrol",   5),
+                car("Tata",    "Nexon EV", 1995000.0,  "Electric", 5),
+                car("Maruti",  "Ertiga",   1099000.0,  "CNG",      7)
         ));
     }
 
@@ -61,7 +59,7 @@ class CarRepositoryTest {
 
     @Test
     void findByPriceLessThanEqual_returnsOnlyCarsWithinBudget() {
-        List<Car> result = carRepository.findByPriceLessThanEqual(1000000.0); // ≤ 10L
+        List<Car> result = carRepository.findByPriceLessThanEqual(1000000.0);
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getModel()).isEqualTo("Swift");
     }

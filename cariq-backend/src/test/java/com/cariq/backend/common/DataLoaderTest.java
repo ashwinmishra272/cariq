@@ -1,7 +1,7 @@
-package com.cariq.backend;
+package com.cariq.backend.common;
 
-import com.cariq.backend.model.Car;
-import com.cariq.backend.repository.CarRepository;
+import com.cariq.backend.car.Car;
+import com.cariq.backend.car.CarRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,7 +12,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@TestPropertySource(properties = "openai.api.key=test-key")
+@TestPropertySource(properties = "openai.api-key=test-key")
 class DataLoaderTest {
 
     @Autowired
@@ -22,14 +22,14 @@ class DataLoaderTest {
     private DataLoader dataLoader;
 
     @Test
-    void load_seeds25Cars() {
-        assertThat(carRepository.count()).isEqualTo(25);
+    void load_seeds95Cars() {
+        assertThat(carRepository.count()).isEqualTo(96);
     }
 
     @Test
     void load_isIdempotent_doesNotDuplicateOnSecondCall() {
-        dataLoader.load(); // second call — should be a no-op
-        assertThat(carRepository.count()).isEqualTo(25);
+        dataLoader.load();
+        assertThat(carRepository.count()).isEqualTo(96);
     }
 
     @Test
@@ -40,7 +40,9 @@ class DataLoaderTest {
                 .toList();
 
         assertThat(makes).contains("Maruti", "Hyundai", "Tata", "Toyota", "Honda",
-                "Kia", "Mahindra", "Skoda", "Volkswagen", "MG", "Renault", "Audi");
+                "Kia", "Mahindra", "Skoda", "Volkswagen", "MG", "Renault", "Audi",
+                "Mercedes-Benz", "BMW", "Volvo", "Land Rover", "Jeep", "Lexus",
+                "Porsche", "BYD", "Genesis");
     }
 
     @Test
@@ -60,7 +62,6 @@ class DataLoaderTest {
                 .findFirst()
                 .orElseThrow();
 
-        // 489 km ARAI range stored as mileage
         assertThat(nexonEv.getMileage()).isGreaterThan(400.0);
         assertThat(nexonEv.getFuelType()).isEqualTo("Electric");
     }
@@ -88,9 +89,8 @@ class DataLoaderTest {
         double minPrice = cars.stream().mapToDouble(Car::getPrice).min().orElseThrow();
         double maxPrice = cars.stream().mapToDouble(Car::getPrice).max().orElseThrow();
 
-        // Swift is the cheapest (~6.65L), Audi Q7 is the most expensive (~89.9L)
-        assertThat(minPrice).isLessThan(700000.0);
-        assertThat(maxPrice).isGreaterThan(8000000.0);
+        assertThat(minPrice).isLessThan(500000.0);
+        assertThat(maxPrice).isGreaterThan(9000000.0);
     }
 
     @Test
@@ -99,6 +99,6 @@ class DataLoaderTest {
                 .filter(c -> c.getSeating() >= 7)
                 .count();
 
-        assertThat(sevenSeaterCount).isGreaterThanOrEqualTo(3); // Ertiga, Innova, Bolero, Fortuner, Scorpio, Q7
+        assertThat(sevenSeaterCount).isGreaterThanOrEqualTo(12);
     }
 }

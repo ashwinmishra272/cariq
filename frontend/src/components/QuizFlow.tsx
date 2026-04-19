@@ -6,162 +6,57 @@ interface Props {
   onComplete: (answers: QuizAnswers, response: RecommendResponse) => void;
 }
 
-// ── data ──────────────────────────────────────────────────────────────────────
-
 const BUDGET_OPTIONS = [
-  { label: 'Under 5L',  sublabel: '< ₹5 Lakh',        value: '0-5'    },
-  { label: '5 – 10L',  sublabel: '₹5 – ₹10 Lakh',    value: '5-10'   },
-  { label: '10 – 15L', sublabel: '₹10 – ₹15 Lakh',   value: '10-15'  },
-  { label: '15 – 25L', sublabel: '₹15 – ₹25 Lakh',   value: '15-25'  },
-  { label: 'Above 25L',sublabel: '₹25 Lakh+',         value: '25-100' },
+  { label: 'Under 5L',   sub: 'Up to ₹5 Lakh',       value: '0-5',    code: '01' },
+  { label: '5 – 10L',   sub: '₹5 – ₹10 Lakh',        value: '5-10',   code: '02' },
+  { label: '10 – 15L',  sub: '₹10 – ₹15 Lakh',       value: '10-15',  code: '03' },
+  { label: '15 – 25L',  sub: '₹15 – ₹25 Lakh',       value: '15-25',  code: '04' },
+  { label: 'Above 25L', sub: '₹25 Lakh and above',    value: '25-9999', code: '05' },
 ];
 
 const USE_OPTIONS = [
-  { label: 'City Commute', icon: '🏙️', value: 'city commute' },
-  { label: 'Family Car',   icon: '👨‍👩‍👧', value: 'family car'   },
-  { label: 'Highway',      icon: '🛣️',  value: 'highway'      },
-  { label: 'First Car',    icon: '🎉', value: 'first car'    },
+  { label: 'City Commute', desc: 'Stop-start traffic, tight parking spots', value: 'city commute', sym: '◈' },
+  { label: 'Family Car',   desc: 'Space, safety, and comfort for all',        value: 'family car',   sym: '◉' },
+  { label: 'Highway',      desc: 'Long-haul drives, open-road performance',   value: 'highway',      sym: '◎' },
+  { label: 'First Car',    desc: 'Easy to drive, forgiving, low stress',       value: 'first car',    sym: '◌' },
 ];
 
 const PRIORITY_OPTIONS = [
-  'Good Mileage',
-  'Automatic',
-  '7 Seats',
-  'Low Maintenance',
-  'Safety 4★+',
+  { label: 'Good Mileage',    tag: 'MPG'   },
+  { label: 'Automatic',       tag: 'AUTO'  },
+  { label: '7 Seats',         tag: '7-STR' },
+  { label: 'Low Maintenance', tag: 'MNTN'  },
+  { label: 'Safety 4★+',      tag: 'SAFE'  },
 ];
 
-const STEP_LABELS = ['Budget', 'Primary Use', 'Priorities', 'Anything Else?'];
+const STEPS = [
+  { idx: '01', title: 'BUDGET',     sub: 'Set your price range' },
+  { idx: '02', title: 'USAGE',      sub: 'How will you drive it?' },
+  { idx: '03', title: 'PRIORITIES', sub: 'What matters most to you?' },
+  { idx: '04', title: 'DETAILS',    sub: 'Anything else we should know?' },
+];
 
-// ── shared card styles ─────────────────────────────────────────────────────────
-
-function cardClass(selected: boolean) {
-  return [
-    'cursor-pointer rounded-2xl border-2 px-5 py-4 text-left transition-all duration-150 select-none',
-    selected
-      ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200 shadow-sm'
-      : 'border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50/40',
-  ].join(' ');
-}
-
-// ── step sub-components ────────────────────────────────────────────────────────
-
-function StepBudget({ selected, onSelect }: { selected: string; onSelect: (v: string) => void }) {
-  return (
-    <div>
-      <h2 className="text-xl font-semibold text-gray-800 mb-1">What's your budget?</h2>
-      <p className="text-sm text-gray-500 mb-5">Select one option</p>
-      <div className="flex flex-col gap-3">
-        {BUDGET_OPTIONS.map(opt => (
-          <button
-            key={opt.value}
-            className={cardClass(selected === opt.value)}
-            onClick={() => onSelect(opt.value)}
-          >
-            <span className="font-semibold text-gray-900">{opt.label}</span>
-            <span className="ml-3 text-sm text-gray-400">{opt.sublabel}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function StepUse({ selected, onSelect }: { selected: string; onSelect: (v: string) => void }) {
-  return (
-    <div>
-      <h2 className="text-xl font-semibold text-gray-800 mb-1">Primary use?</h2>
-      <p className="text-sm text-gray-500 mb-5">How will you mostly use the car?</p>
-      <div className="grid grid-cols-2 gap-3">
-        {USE_OPTIONS.map(opt => (
-          <button
-            key={opt.value}
-            className={cardClass(selected === opt.value)}
-            onClick={() => onSelect(opt.value)}
-          >
-            <div className="text-2xl mb-1">{opt.icon}</div>
-            <div className="font-semibold text-gray-900 text-sm">{opt.label}</div>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function StepPriorities({
-  selected,
-  onToggle,
-}: {
-  selected: string[];
-  onToggle: (v: string) => void;
-}) {
-  return (
-    <div>
-      <h2 className="text-xl font-semibold text-gray-800 mb-1">What matters most?</h2>
-      <p className="text-sm text-gray-500 mb-5">Pick one or more</p>
-      <div className="flex flex-wrap gap-3">
-        {PRIORITY_OPTIONS.map(opt => {
-          const active = selected.includes(opt);
-          return (
-            <button
-              key={opt}
-              onClick={() => onToggle(opt)}
-              className={[
-                'rounded-full border-2 px-5 py-2 text-sm font-medium transition-all duration-150 select-none',
-                active
-                  ? 'border-blue-500 bg-blue-500 text-white shadow-sm'
-                  : 'border-gray-200 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50',
-              ].join(' ')}
-            >
-              {opt}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function StepExtra({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  return (
-    <div>
-      <h2 className="text-xl font-semibold text-gray-800 mb-1">Anything else?</h2>
-      <p className="text-sm text-gray-500 mb-5">Optional — tell us more about your needs</p>
-      <textarea
-        rows={5}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        placeholder="e.g. I need good boot space or I like black cars"
-        className="w-full rounded-2xl border-2 border-gray-200 px-4 py-3 text-sm text-gray-800 placeholder-gray-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all resize-none"
-      />
-    </div>
-  );
-}
-
-// ── main component ─────────────────────────────────────────────────────────────
+const D: React.CSSProperties = { fontFamily: 'var(--font-display)', letterSpacing: '1.5px' };
+const M: React.CSSProperties = { fontFamily: 'var(--font-mono)', letterSpacing: '2px' };
+const B: React.CSSProperties = { fontFamily: 'var(--font-body)', letterSpacing: '0.3px' };
 
 export default function QuizFlow({ onComplete }: Props) {
-  const [step, setStep] = useState(1);
-  const [visible, setVisible] = useState(true);
-
-  const [budget, setBudget]       = useState('');
-  const [useCase, setUseCase]     = useState('');
+  const [step, setStep]             = useState(1);
+  const [visible, setVisible]       = useState(true);
+  const [budget, setBudget]         = useState('');
+  const [useCase, setUseCase]       = useState('');
   const [priorities, setPriorities] = useState<string[]>([]);
-  const [extraInfo, setExtraInfo]  = useState('');
-
-  const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState('');
+  const [extraInfo, setExtraInfo]   = useState('');
+  const [loading, setLoading]       = useState(false);
+  const [error, setError]           = useState('');
 
   function transition(fn: () => void) {
     setVisible(false);
-    setTimeout(() => {
-      fn();
-      setVisible(true);
-    }, 180);
+    setTimeout(() => { fn(); setVisible(true); }, 200);
   }
 
-  function goNext() { transition(() => setStep(s => s + 1)); }
-  function goBack() { transition(() => setStep(s => s - 1)); }
+  const goNext = () => transition(() => setStep(s => s + 1));
+  const goBack = () => transition(() => setStep(s => s - 1));
 
   function togglePriority(p: string) {
     setPriorities(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]);
@@ -171,7 +66,7 @@ export default function QuizFlow({ onComplete }: Props) {
     if (step === 1) return budget !== '';
     if (step === 2) return useCase !== '';
     if (step === 3) return priorities.length > 0;
-    return true; // step 4 is optional
+    return true;
   }
 
   async function handleSubmit() {
@@ -182,108 +77,329 @@ export default function QuizFlow({ onComplete }: Props) {
       const response = await getRecommendations(answers);
       onComplete(answers, response);
     } catch {
-      setError('Something went wrong. Please check your connection and try again.');
+      setError('Connection failed. Check your network and try again.');
     } finally {
       setLoading(false);
     }
   }
 
+  const cur = STEPS[step - 1];
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-lg">
+    <div style={{ minHeight: '100svh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
 
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Find Your Perfect Car</h1>
-          <p className="mt-1 text-gray-500 text-sm">Answer 4 quick questions — we'll do the rest</p>
+      {/* ── Top Bar ──────────────────────────────────────── */}
+      <header style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '18px 32px', borderBottom: '1px solid var(--border)',
+        background: 'var(--bg)', position: 'sticky', top: 0, zIndex: 20,
+      }}>
+        <div style={{ ...D, fontSize: '20px', color: 'var(--text)' }}>
+          CAR<span style={{ color: 'var(--accent)' }}>IQ</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <span style={{ ...M, fontSize: '11px', color: 'var(--text-muted)' }}>
+            {cur.idx} / 04
+          </span>
+          <div style={{ width: '100px', height: '2px', background: 'var(--border)', borderRadius: '1px', overflow: 'hidden' }}>
+            <div style={{
+              height: '100%', background: 'var(--accent)',
+              width: `${(step / 4) * 100}%`,
+              transition: 'width 0.45s cubic-bezier(0.4,0,0.2,1)',
+            }} />
+          </div>
+        </div>
+      </header>
+
+      {/* ── Split Layout ──────────────────────────────────── */}
+      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'clamp(280px, 30%, 400px) 1fr' }}>
+
+        {/* Left: Question Panel */}
+        <div style={{
+          background: 'var(--bg-2)', borderRight: '1px solid var(--border)',
+          padding: '52px 36px 44px',
+          display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+          position: 'sticky', top: '57px', height: 'calc(100svh - 57px)',
+          overflow: 'hidden',
+        }}>
+          {/* Ghost number */}
+          <div aria-hidden style={{
+            position: 'absolute', bottom: '-24px', right: '-8px',
+            ...D, fontSize: '180px', lineHeight: 1,
+            color: 'var(--border)', pointerEvents: 'none', userSelect: 'none',
+          }}>
+            {cur.idx}
+          </div>
+
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <div style={{ ...M, fontSize: '11px', color: 'var(--accent)', marginBottom: '24px' }}>
+              STEP {cur.idx} OF 04
+            </div>
+            <h2 style={{
+              ...D, fontSize: 'clamp(48px, 5.5vw, 76px)',
+              lineHeight: 1, color: 'var(--text)', marginBottom: '12px',
+            }}>
+              {cur.title}
+            </h2>
+            <p style={{ ...B, fontSize: '17px', color: 'var(--text-dim)', fontWeight: 400 }}>
+              {cur.sub}
+            </p>
+          </div>
+
+          {/* Step lines */}
+          <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {STEPS.map((s, i) => {
+              const done    = i + 1 < step;
+              const active  = i + 1 === step;
+              return (
+                <div key={s.idx} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{
+                    flex: 1, height: '1px',
+                    background: done || active ? 'var(--accent)' : 'var(--border)',
+                    opacity: done ? 0.45 : 1,
+                    transition: 'background 0.3s ease',
+                  }} />
+                  <span style={{
+                    ...M, fontSize: '10px',
+                    color: done || active ? 'var(--accent)' : '#3e3e3e',
+                    transition: 'color 0.3s ease', minWidth: '16px', textAlign: 'right',
+                  }}>
+                    {s.idx}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Progress bar */}
-        <div className="mb-8">
-          <div className="flex justify-between mb-2">
-            {STEP_LABELS.map((label, i) => (
-              <span
-                key={label}
-                className={[
-                  'text-xs font-medium transition-colors',
-                  i + 1 < step  ? 'text-blue-400' :
-                  i + 1 === step ? 'text-blue-600' :
-                  'text-gray-300',
-                ].join(' ')}
+        {/* Right: Options Panel */}
+        <div style={{ padding: 'clamp(32px,5vw,68px) clamp(24px,6vw,80px)', overflowY: 'auto' }}>
+          <div style={{
+            opacity: visible ? 1 : 0,
+            transform: visible ? 'translateX(0)' : 'translateX(14px)',
+            transition: 'opacity 0.2s ease, transform 0.2s ease',
+          }}>
+
+            {/* Step 1 — Budget */}
+            {step === 1 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {BUDGET_OPTIONS.map((opt, i) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setBudget(opt.value)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '18px',
+                      padding: '17px 20px',
+                      background: budget === opt.value ? 'var(--accent-glow)' : 'var(--surface)',
+                      border: budget === opt.value ? '1px solid var(--accent-border)' : '1px solid var(--border)',
+                      borderRadius: '3px', cursor: 'pointer', textAlign: 'left',
+                      transition: 'all 0.13s ease',
+                      animation: `fadeUp 0.35s ${i * 0.05}s ease both`,
+                    }}
+                    onMouseEnter={e => { if (budget !== opt.value) (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-light)'; }}
+                    onMouseLeave={e => { if (budget !== opt.value) (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; }}
+                  >
+                    <span style={{ ...M, fontSize: '11px', color: budget === opt.value ? 'var(--accent)' : 'var(--text-muted)', minWidth: '18px' }}>
+                      {opt.code}
+                    </span>
+                    <span style={{ ...D, fontSize: '26px', color: budget === opt.value ? 'var(--text)' : 'var(--text-dim)', transition: 'color 0.13s', flex: 1 }}>
+                      {opt.label}
+                    </span>
+                    <span style={{ ...B, fontSize: '14px', color: 'var(--text-muted)', fontWeight: 400 }}>
+                      {opt.sub}
+                    </span>
+                    {budget === opt.value && <span style={{ color: 'var(--accent)', fontSize: '13px' }}>→</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Step 2 — Use Case */}
+            {step === 2 && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
+                {USE_OPTIONS.map((opt, i) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setUseCase(opt.value)}
+                    style={{
+                      padding: '26px 20px',
+                      background: useCase === opt.value ? 'var(--accent-glow)' : 'var(--surface)',
+                      border: useCase === opt.value ? '1px solid var(--accent-border)' : '1px solid var(--border)',
+                      borderRadius: '3px', cursor: 'pointer', textAlign: 'left',
+                      transition: 'all 0.13s ease',
+                      animation: `fadeUp 0.35s ${i * 0.065}s ease both`,
+                    }}
+                    onMouseEnter={e => { if (useCase !== opt.value) (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-light)'; }}
+                    onMouseLeave={e => { if (useCase !== opt.value) (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; }}
+                  >
+                    <div style={{ fontSize: '20px', color: useCase === opt.value ? 'var(--accent)' : '#484848', marginBottom: '16px', lineHeight: 1, transition: 'color 0.13s' }}>
+                      {opt.sym}
+                    </div>
+                    <div style={{ ...D, fontSize: '22px', color: useCase === opt.value ? 'var(--text)' : 'var(--text-dim)', marginBottom: '6px', transition: 'color 0.13s' }}>
+                      {opt.label}
+                    </div>
+                    <div style={{ ...B, fontSize: '14px', color: 'var(--text-muted)', fontWeight: 400, lineHeight: 1.45 }}>
+                      {opt.desc}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Step 3 — Priorities */}
+            {step === 3 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <p style={{ ...M, fontSize: '11px', color: 'var(--text-muted)', marginBottom: '14px' }}>
+                  SELECT ALL THAT APPLY
+                </p>
+                {PRIORITY_OPTIONS.map((opt, i) => {
+                  const active = priorities.includes(opt.label);
+                  return (
+                    <button
+                      key={opt.label}
+                      onClick={() => togglePriority(opt.label)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '14px',
+                        padding: '15px 20px',
+                        background: active ? 'var(--accent-glow)' : 'var(--surface)',
+                        border: active ? '1px solid var(--accent-border)' : '1px solid var(--border)',
+                        borderRadius: '3px', cursor: 'pointer', textAlign: 'left',
+                        transition: 'all 0.13s ease',
+                        animation: `fadeUp 0.35s ${i * 0.06}s ease both`,
+                      }}
+                    >
+                      <div style={{
+                        width: '16px', height: '16px', flexShrink: 0,
+                        border: active ? '2px solid var(--accent)' : '2px solid #404040',
+                        borderRadius: '2px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: active ? 'var(--accent)' : 'transparent',
+                        transition: 'all 0.13s ease',
+                      }}>
+                        {active && (
+                          <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
+                            <path d="M1 3L3 5L7 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                      </div>
+                      <span style={{ ...B, fontSize: '19px', fontWeight: 500, color: active ? 'var(--text)' : 'var(--text-dim)', flex: 1, transition: 'color 0.13s' }}>
+                        {opt.label}
+                      </span>
+                      <span style={{ ...M, fontSize: '11px', color: active ? 'var(--accent)' : '#484848', transition: 'color 0.13s' }}>
+                        {opt.tag}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Step 4 — Extra info */}
+            {step === 4 && (
+              <div style={{ animation: 'fadeUp 0.35s ease both' }}>
+                <textarea
+                  rows={7}
+                  value={extraInfo}
+                  onChange={e => setExtraInfo(e.target.value)}
+                  placeholder="e.g. I want good boot space, prefer dark colours, drive mostly at night, need a sunroof..."
+                  style={{
+                    width: '100%',
+                    background: 'var(--surface)', border: '1px solid var(--border)',
+                    borderRadius: '3px', padding: '20px',
+                    ...B, fontSize: '17px', fontWeight: 300,
+                    color: 'var(--text)', lineHeight: 1.6, resize: 'none', outline: 'none',
+                    transition: 'border-color 0.14s ease',
+                  }}
+                  onFocus={e => { (e.target as HTMLElement).style.borderColor = 'var(--accent-border)'; }}
+                  onBlur={e => { (e.target as HTMLElement).style.borderColor = 'var(--border)'; }}
+                />
+                <p style={{ ...M, fontSize: '11px', color: 'var(--text-muted)', marginTop: '10px' }}>
+                  OPTIONAL — skip if nothing specific comes to mind
+                </p>
+              </div>
+            )}
+
+            {/* Error */}
+            {error && (
+              <div style={{
+                marginTop: '20px', padding: '13px 16px',
+                background: 'rgba(255,80,80,0.05)', border: '1px solid rgba(255,80,80,0.2)',
+                borderRadius: '3px', ...B, fontSize: '15px', color: '#ff7070',
+              }}>
+                {error}
+              </div>
+            )}
+
+            {/* Navigation */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '44px' }}>
+              <button
+                onClick={goBack}
+                disabled={step === 1}
+                style={{
+                  ...M, fontSize: '10px', letterSpacing: '2px',
+                  color: step === 1 ? '#3a3a3a' : 'var(--text-muted)',
+                  background: 'none', border: 'none', padding: 0,
+                  cursor: step === 1 ? 'default' : 'pointer',
+                  transition: 'color 0.14s ease',
+                }}
+                onMouseEnter={e => { if (step > 1) (e.currentTarget as HTMLElement).style.color = 'var(--text)'; }}
+                onMouseLeave={e => { if (step > 1) (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)'; }}
               >
-                {label}
-              </span>
-            ))}
-          </div>
-          <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-blue-500 rounded-full transition-all duration-500 ease-out"
-              style={{ width: `${(step / STEP_LABELS.length) * 100}%` }}
-            />
-          </div>
-          <p className="mt-2 text-right text-xs text-gray-400">Step {step} of {STEP_LABELS.length}</p>
-        </div>
+                ← BACK
+              </button>
 
-        {/* Step content with fade + slide transition */}
-        <div
-          className={[
-            'transition-all duration-200 ease-out',
-            visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3',
-          ].join(' ')}
-        >
-          {step === 1 && <StepBudget    selected={budget}    onSelect={setBudget}    />}
-          {step === 2 && <StepUse       selected={useCase}   onSelect={setUseCase}   />}
-          {step === 3 && <StepPriorities selected={priorities} onToggle={togglePriority} />}
-          {step === 4 && <StepExtra     value={extraInfo}    onChange={setExtraInfo}  />}
-        </div>
-
-        {/* Error flash */}
-        {error && (
-          <div className="mt-5 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            <span className="mt-0.5">⚠️</span>
-            <span>{error}</span>
-          </div>
-        )}
-
-        {/* Navigation */}
-        <div className="mt-8 flex items-center justify-between">
-          <button
-            onClick={goBack}
-            disabled={step === 1}
-            className="px-4 py-2 text-sm text-gray-500 hover:text-gray-800 disabled:invisible transition-colors"
-          >
-            ← Back
-          </button>
-
-          {step < 4 ? (
-            <button
-              onClick={goNext}
-              disabled={!canProceed()}
-              className="px-6 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold shadow-sm hover:bg-blue-700 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-            >
-              Next →
-            </button>
-          ) : (
-            <button
-              onClick={handleSubmit}
-              disabled={loading}
-              className="flex items-center gap-2 px-7 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold shadow-sm hover:bg-blue-700 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
-            >
-              {loading ? (
-                <>
-                  <svg className="animate-spin h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                  </svg>
-                  Finding cars…
-                </>
+              {step < 4 ? (
+                <button
+                  onClick={goNext}
+                  disabled={!canProceed()}
+                  style={{
+                    ...D, fontSize: '16px', letterSpacing: '3px',
+                    padding: '12px 36px',
+                    background: canProceed() ? 'var(--accent)' : 'var(--surface)',
+                    color: canProceed() ? '#fff' : '#484848',
+                    border: canProceed() ? '1px solid var(--accent)' : '1px solid var(--border)',
+                    borderRadius: '2px',
+                    cursor: canProceed() ? 'pointer' : 'not-allowed',
+                    transition: 'all 0.16s ease',
+                  }}
+                  onMouseEnter={e => { if (canProceed()) (e.currentTarget as HTMLElement).style.background = '#ff6b0a'; }}
+                  onMouseLeave={e => { if (canProceed()) (e.currentTarget as HTMLElement).style.background = 'var(--accent)'; }}
+                >
+                  CONTINUE →
+                </button>
               ) : (
-                '🚗 Find My Car'
+                <button
+                  onClick={handleSubmit}
+                  disabled={loading}
+                  style={{
+                    ...D, fontSize: '16px', letterSpacing: '3px',
+                    padding: '12px 36px',
+                    background: loading ? 'var(--surface)' : 'var(--accent)',
+                    color: loading ? '#5a5a5a' : '#fff',
+                    border: loading ? '1px solid var(--border)' : '1px solid var(--accent)',
+                    borderRadius: '2px',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    display: 'flex', alignItems: 'center', gap: '10px',
+                    transition: 'all 0.16s ease',
+                  }}
+                  onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLElement).style.background = '#ff6b0a'; }}
+                  onMouseLeave={e => { if (!loading) (e.currentTarget as HTMLElement).style.background = 'var(--accent)'; }}
+                >
+                  {loading ? (
+                    <>
+                      <svg style={{ animation: 'spin 0.8s linear infinite', width: '13px', height: '13px', flexShrink: 0 }} viewBox="0 0 24 24" fill="none">
+                        <circle style={{ opacity: 0.2 }} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+                        <path style={{ opacity: 0.9 }} fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                      </svg>
+                      ANALYSING...
+                    </>
+                  ) : 'GET MY SHORTLIST →'}
+                </button>
               )}
-            </button>
-          )}
-        </div>
+            </div>
 
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -9,6 +9,7 @@ export interface Car {
   mileage: number;
   seating: number;
   safetyRating: number;
+  userRating: number;
   pros: string;
   cons: string;
 }

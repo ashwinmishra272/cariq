@@ -1,11 +1,32 @@
-HELP.md
-.gradle
+### Gradle ###
+.gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### STS ###
+### Java ###
+*.class
+*.jar
+*.war
+*.ear
+
+### Spring Boot ###
+src/main/resources/application-local.*
+src/main/resources/application-*.properties
+!src/main/resources/application.properties
+!src/main/resources/application.yml
+
+### IDE - IntelliJ IDEA ###
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### IDE - STS / Eclipse ###
 .apt_generated
 .classpath
 .factorypath
@@ -17,23 +38,22 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-
-### NetBeans ###
+### IDE - NetBeans ###
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
 
-### VS Code ###
+### IDE - VS Code ###
 .vscode/
 
-src/main/resources/application-local.properties
+### macOS ###
+.DS_Store
+
+### Secrets ###
+*.env
+.env.*
+
+### Claude Code ###
+.claude/

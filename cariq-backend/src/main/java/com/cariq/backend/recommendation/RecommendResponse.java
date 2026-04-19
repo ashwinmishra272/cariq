@@ -1,6 +1,6 @@
-package com.cariq.backend.dto;
+package com.cariq.backend.recommendation;
 
-import com.cariq.backend.model.Car;
+import com.cariq.backend.car.Car;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

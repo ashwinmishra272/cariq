@@ -1,13 +1,15 @@
-package com.cariq.backend.model;
+package com.cariq.backend.car;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class Car {
 
     @Id
@@ -23,7 +25,8 @@ public class Car {
     private Double mileage;
     private Integer seating;
     private Integer safetyRating;
-    private String useCases; // e.g. "city", "family", "highway"
+    private Double userRating;
+    private String useCases;
     private String pros;
     private String cons;
 }

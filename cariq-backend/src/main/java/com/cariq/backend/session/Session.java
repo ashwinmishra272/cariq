@@ -1,16 +1,18 @@
-package com.cariq.backend.model;
+package com.cariq.backend.session;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class Session {
 
     @Id
@@ -21,6 +23,7 @@ public class Session {
 
     @Column(columnDefinition = "TEXT")
     private String recommendationsJson;
+
     private LocalDateTime createdAt;
 
     @PrePersist
